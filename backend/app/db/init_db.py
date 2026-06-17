@@ -55,9 +55,11 @@ def init_db() -> None:
 
         db.add_all(
             [
-                Payment(contract_id=contracts[0].id, period=today.strftime("%Y-%m"), amount=6800, due_date=today - timedelta(days=5), status="overdue", note="本月租金"),
-                Payment(contract_id=contracts[1].id, period=today.strftime("%Y-%m"), amount=12800, due_date=today + timedelta(days=7), status="unpaid", note="本月租金"),
-                Payment(contract_id=contracts[1].id, period=(today + timedelta(days=31)).strftime("%Y-%m"), amount=12800, due_date=today + timedelta(days=37), status="unpaid", note="下月租金"),
+                Payment(contract_id=contracts[0].id, period=today.strftime("%Y-%m"), amount=6800, due_date=today - timedelta(days=5), status="overdue", expense_type="rent", note="本月租金"),
+                Payment(contract_id=contracts[0].id, period=today.strftime("%Y-%m"), amount=500, due_date=today - timedelta(days=5), status="overdue", expense_type="management_fee", note="物业费"),
+                Payment(contract_id=contracts[1].id, period=today.strftime("%Y-%m"), amount=12800, due_date=today + timedelta(days=7), status="unpaid", expense_type="rent", note="本月租金"),
+                Payment(contract_id=contracts[1].id, period=today.strftime("%Y-%m"), amount=800, due_date=today + timedelta(days=7), status="unpaid", expense_type="utility", note="水电费"),
+                Payment(contract_id=contracts[1].id, period=(today + timedelta(days=31)).strftime("%Y-%m"), amount=12800, due_date=today + timedelta(days=37), status="unpaid", expense_type="rent", note="下月租金"),
             ]
         )
         db.commit()

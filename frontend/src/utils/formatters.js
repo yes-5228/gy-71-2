@@ -22,6 +22,17 @@ export function statusText(value) {
   return map[value] || value
 }
 
+export function expenseTypeText(value) {
+  const map = {
+    rent: '租金',
+    deposit: '押金',
+    management_fee: '物业费',
+    utility: '水电费',
+    other: '其他'
+  }
+  return map[value] || value
+}
+
 export function todayISO() {
   return new Date().toISOString().slice(0, 10)
 }

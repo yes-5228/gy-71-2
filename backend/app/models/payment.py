@@ -18,5 +18,6 @@ class Payment(Base):
     status: Mapped[str] = mapped_column(String(24), default="unpaid", index=True)
     method: Mapped[str] = mapped_column(String(40), default="")
     note: Mapped[str] = mapped_column(String(255), default="")
+    expense_type: Mapped[str] = mapped_column(String(32), default="rent", index=True)
 
     contract = relationship("Contract", back_populates="payments")
