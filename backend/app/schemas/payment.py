@@ -39,3 +39,5 @@ class PaymentSummary(BaseModel):
     unpaid_amount: float
     overdue_amount: float
     overdue_count: int
+    overdue_alert_amount: float
+    overdue_alert_count: int

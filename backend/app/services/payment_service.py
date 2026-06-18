@@ -50,7 +50,7 @@ def get_payment_summary(db: Session, floor: str | None = None, tenant: str | Non
                         expense_type: str | None = None) -> PaymentSummary:
     refresh_overdue_payments(db)
 
-    def _filtered_sum(status_val: str | None):
+    def _filtered_sum(status_val: str | None, skip_status_filter: bool = False):
         stmt = (
             select(func.coalesce(func.sum(Payment.amount), 0))
             .select_from(Payment)
@@ -59,23 +59,31 @@ def get_payment_summary(db: Session, floor: str | None = None, tenant: str | Non
         )
         if status_val:
             stmt = stmt.where(Payment.status == status_val)
-        stmt = _apply_filters(stmt, floor, tenant, period, status, expense_type)
+        effective_status = None if skip_status_filter else status
+        stmt = _apply_filters(stmt, floor, tenant, period, effective_status, expense_type)
         return float(db.scalar(stmt) or 0)
+
+    def _filtered_count(status_val: str | None, skip_status_filter: bool = False):
+        stmt = (
+            select(func.count())
+            .select_from(Payment)
+            .join(Payment.contract)
+            .join(Contract.workstation)
+        )
+        if status_val:
+            stmt = stmt.where(Payment.status == status_val)
+        effective_status = None if skip_status_filter else status
+        stmt = _apply_filters(stmt, floor, tenant, period, effective_status, expense_type)
+        return int(db.scalar(stmt) or 0)
 
     total_amount = _filtered_sum(None)
     paid_amount = _filtered_sum("paid")
     unpaid_amount = _filtered_sum("unpaid")
     overdue_amount = _filtered_sum("overdue")
+    overdue_count = _filtered_count("overdue")
 
-    count_stmt = (
-        select(func.count())
-        .select_from(Payment)
-        .join(Payment.contract)
-        .join(Contract.workstation)
-        .where(Payment.status == "overdue")
-    )
-    count_stmt = _apply_filters(count_stmt, floor, tenant, period, status, expense_type)
-    overdue_count = int(db.scalar(count_stmt) or 0)
+    overdue_alert_amount = _filtered_sum("overdue", skip_status_filter=True)
+    overdue_alert_count = _filtered_count("overdue", skip_status_filter=True)
 
     return PaymentSummary(
         total_amount=total_amount,
@@ -83,6 +91,8 @@ def get_payment_summary(db: Session, floor: str | None = None, tenant: str | Non
         unpaid_amount=unpaid_amount,
         overdue_amount=overdue_amount,
         overdue_count=overdue_count,
+        overdue_alert_amount=overdue_alert_amount,
+        overdue_alert_count=overdue_alert_count,
     )
 
 
