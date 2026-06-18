@@ -46,14 +46,14 @@
       </div>
       <div class="summary-card danger">
         <span>逾期金额</span>
-        <strong>{{ currency(summary.overdue_amount) }}</strong>
-        <small v-if="summary.overdue_count">{{ summary.overdue_count }} 笔逾期</small>
+        <strong>{{ currency(summary.overdue_alert_amount) }}</strong>
+        <small v-if="summary.overdue_alert_count">{{ summary.overdue_alert_count }} 笔逾期</small>
       </div>
     </div>
 
     <div v-if="summary && summary.overdue_alert_count > 0" class="overdue-alert">
       <strong>逾期提醒</strong>
-      <span>当前筛选下有 {{ summary.overdue_alert_count }} 笔逾期账单，合计 {{ currency(summary.overdue_alert_amount) }}，请及时催收。</span>
+      <span>有 {{ summary.overdue_alert_count }} 笔逾期账单，合计 {{ currency(summary.overdue_alert_amount) }}，请及时催收。</span>
     </div>
 
     <form class="form-grid" @submit.prevent="submit">
